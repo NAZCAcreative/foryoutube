@@ -1,0 +1,250 @@
+<div id="lesson-cut-preview" class="viz-dotted-background" lang="ko">
+  <style>
+    #lesson-cut-preview {
+      --paper: light-dark(#fffefa, #202321);
+      --ink: light-dark(#202c27, #eff5ee);
+      --muted-ink: light-dark(#52625a, #b5c2b9);
+      --line: light-dark(#d9dfd8, #404943);
+      --soft: light-dark(#edf1eb, #2c352f);
+      --selected: light-dark(#214d3e, #bfdcca);
+      --on-selected: light-dark(#fbfff9, #132d23);
+      --board: light-dark(#fbf4de, #e9e3d1);
+      --board-ink: light-dark(#364535, #2a3d30);
+      --peel: light-dark(#fee3a5, #f5dba1);
+      --slice: light-dark(#dca85c, #daa253);
+      --emphasis: light-dark(#b94d26, #a74320);
+      --viewer: light-dark(#e8ede8, #29312d);
+      --call: light-dark(#273f37, #263d34);
+      --caption: light-dark(#17382f, #162f28);
+      --caption-ink: light-dark(#fbfbef, #f4f7ed);
+      color: var(--ink);
+      font-family: Inter, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+      word-break: keep-all;
+      container-type: inline-size;
+      padding: 8px;
+    }
+    #lesson-cut-preview *, #lesson-cut-preview *::before, #lesson-cut-preview *::after { box-sizing: border-box; }
+    #lesson-cut-preview [hidden] { display: none !important; }
+    #lesson-cut-preview :is(h2,h3,p,figure,ol) { margin: 0; }
+    #lesson-cut-preview .product { background: var(--paper); border: 1px solid var(--line); border-radius: 16px; padding: clamp(14px,3%,24px); }
+    #lesson-cut-preview .eyebrow, #lesson-cut-preview .metadata { color: var(--muted-ink); font-size: 12px; font-variant-numeric: tabular-nums; }
+    #lesson-cut-preview h2 { margin-top: 4px; font-size: 23px; letter-spacing: -.045em; line-height: 1.35; }
+    #lesson-cut-preview h3 { font-size: 15px; line-height: 1.5; }
+    #lesson-cut-preview button { font: inherit; color: var(--ink); cursor: pointer; }
+    #lesson-cut-preview .formats { display: flex; flex-wrap: wrap; gap: 6px; margin: 15px 0; }
+    #lesson-cut-preview .format, #lesson-cut-preview .action { border: 1px solid var(--line); border-radius: 8px; background: var(--paper); }
+    #lesson-cut-preview .format { padding: 7px 12px; font-size: 14px; }
+    #lesson-cut-preview .format[aria-pressed="true"] { background: var(--selected); color: var(--on-selected); border-color: var(--selected); }
+    #lesson-cut-preview .duration { margin-inline-start: 4px; font-variant-numeric: tabular-nums; }
+    #lesson-cut-preview .layout { display: grid; grid-template-columns: minmax(0,1fr); gap: 18px; align-items: start; }
+    #lesson-cut-preview .stage { display: grid; place-items: center; background: var(--viewer); border-radius: 10px; padding: 8px; }
+    #lesson-cut-preview .frame { position: relative; display: grid; grid-template-columns: minmax(0,1fr); overflow: hidden; width: 100%; aspect-ratio: 16 / 9; border-radius: 6px; background: var(--board); color: var(--board-ink); container-type: inline-size; }
+    #lesson-cut-preview .frame.portrait { aspect-ratio: 9 / 16; width: min(100%, 153px); }
+    #lesson-cut-preview .frame.meeting { grid-template-columns: minmax(0,1fr) 24%; }
+    #lesson-cut-preview .worksheet { display: flex; min-width: 0; flex-direction: column; align-items: center; justify-content: center; gap: 4px; padding: 5px 4px; }
+    #lesson-cut-preview .subtitled .worksheet { padding-bottom: 32px; }
+    #lesson-cut-preview .prompt { text-align: center; font-size: clamp(12px,4.3cqw,17px); font-weight: 650; }
+    #lesson-cut-preview .pieces { display: flex; gap: clamp(10px,5.2cqw,24px); align-items: center; }
+    #lesson-cut-preview .piece { display: grid; justify-items: center; gap: 2px; }
+    #lesson-cut-preview .pie { --angle: 120deg; --fill: var(--slice); position: relative; overflow: hidden; width: clamp(34px,15cqw,66px); aspect-ratio: 1; border: 1px solid var(--board-ink); border-radius: 50%; background: linear-gradient(var(--board-ink),var(--board-ink)) top center / 1px 50% no-repeat, conic-gradient(var(--fill) 0deg var(--angle), var(--peel) var(--angle) 1turn); }
+    #lesson-cut-preview .third::before, #lesson-cut-preview .third::after { content: ""; position: absolute; top: 0; left: calc(50% - .5px); width: 1px; height: 50%; background: var(--board-ink); transform-origin: bottom; }
+    #lesson-cut-preview .third::before { transform: rotate(120deg); }
+    #lesson-cut-preview .third::after { transform: rotate(240deg); }
+    #lesson-cut-preview .fourth { --angle: 90deg; background: linear-gradient(var(--board-ink),var(--board-ink)) center / 1px 100% no-repeat, linear-gradient(var(--board-ink),var(--board-ink)) center / 100% 1px no-repeat, conic-gradient(var(--fill) 0deg var(--angle), var(--peel) var(--angle) 1turn); }
+    #lesson-cut-preview .marked .third { --fill: var(--emphasis); }
+    #lesson-cut-preview .fraction { font: 500 16px/1.15 Georgia, serif; font-variant-numeric: lining-nums; }
+    #lesson-cut-preview .marked .piece:first-child .fraction { text-decoration: underline; text-underline-offset: 2px; }
+    #lesson-cut-preview .people { display: grid; align-content: center; gap: 10px; justify-items: center; color: var(--caption-ink); background: var(--call); font-size: 11px; }
+    #lesson-cut-preview .people span { display: grid; justify-items: center; gap: 2px; }
+    #lesson-cut-preview .people i { display: block; width: 17px; height: 17px; background: var(--peel); border-radius: 50%; }
+    #lesson-cut-preview .people span + span i { background: light-dark(#accee4, #accbdc); }
+    #lesson-cut-preview .caption { position: absolute; bottom: 6px; left: 5px; right: 5px; margin-inline: auto; width: fit-content; max-width: calc(100% - 10px); padding: 3px 6px; border-radius: 4px; background: var(--caption); color: var(--caption-ink); text-align: center; font-size: clamp(11px,3.6cqw,14px); line-height: 1.3; }
+    #lesson-cut-preview .portrait .worksheet { padding: 10px 4px 42px; gap: 13px; }
+    #lesson-cut-preview .portrait .pieces { flex-direction: column; gap: 8px; }
+    #lesson-cut-preview .portrait .pie { width: 40px; }
+    #lesson-cut-preview .portrait .caption { bottom: 10px; }
+    #lesson-cut-preview .compare, #lesson-cut-preview .options { display: flex; align-items: center; flex-wrap: wrap; gap: 6px 12px; margin-top: 8px; }
+    #lesson-cut-preview .compare { justify-content: space-between; }
+    #lesson-cut-preview .action { padding: 5px 9px; font-size: 12px; white-space: nowrap; }
+    #lesson-cut-preview .action[aria-pressed="true"] { background: var(--selected); color: var(--on-selected); }
+    #lesson-cut-preview .option { display: inline-flex; gap: 5px; align-items: center; font-size: 13px; cursor: pointer; }
+    #lesson-cut-preview input { margin: 0; accent-color: var(--selected); }
+    #lesson-cut-preview .script { margin-top: 8px; padding: 8px 10px; border-radius: 6px; background: var(--soft); font-size: 13px; }
+    #lesson-cut-preview .edit-list { list-style: none; padding: 0; margin-top: 4px; }
+    #lesson-cut-preview .edit-list li { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 0; border-top: 1px solid var(--line); }
+    #lesson-cut-preview .edit-title { font-size: 14px; }
+    #lesson-cut-preview .edit-list p + p { margin-top: 2px; }
+    #lesson-cut-preview .sr { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+    @container (min-width: 580px) {
+      #lesson-cut-preview .layout { grid-template-columns: minmax(0,1.2fr) minmax(0,1fr); gap: 20px; }
+    }
+    @media (pointer: coarse) {
+      #lesson-cut-preview :is(.action,.format,.option) { min-height: 44px; }
+    }
+  </style>
+  <section class="product" aria-label="온라인 수업 자동 편집 예시">
+    <header>
+      <p class="eyebrow">예시 · 온라인 1:1 수업 · 원본 54:12</p>
+      <h2>자동 편집 결과</h2>
+    </header>
+    <div class="formats" role="group" aria-label="편집본 선택">
+      <button type="button" class="format" data-format="lesson" aria-pressed="true">본편 <span class="duration">7:12</span></button>
+      <button type="button" class="format" data-format="short" aria-pressed="false">세로 쇼츠 <span class="duration">0:43</span></button>
+    </div>
+    <div class="layout">
+      <section aria-label="편집 장면 미리보기">
+        <div class="stage">
+          <div class="frame marked subtitled" data-frame>
+            <div class="worksheet">
+              <p class="prompt">어느 조각이 더 클까요?</p>
+              <div class="pieces" aria-label="같은 크기의 피자를 3등분한 한 조각과 4등분한 한 조각">
+                <div class="piece"><span class="pie third" aria-hidden="true"></span><span class="fraction">1/3</span></div>
+                <div class="piece"><span class="pie fourth" aria-hidden="true"></span><span class="fraction">1/4</span></div>
+              </div>
+            </div>
+            <div class="people" hidden><span><i aria-hidden="true"></i>선생님</span><span><i aria-hidden="true"></i>학생</span></div>
+            <p class="caption">선생님 · 같은 크기의 피자를 나눠 볼게요.</p>
+          </div>
+        </div>
+        <div class="compare">
+          <span class="metadata" data-position>원본 23:46 · 16:9</span>
+          <button type="button" class="action" data-compare aria-pressed="false">원본 보기</button>
+        </div>
+        <div class="options">
+          <label class="option"><input type="checkbox" data-option="captions" checked> 화자별 자막</label>
+          <label class="option"><input type="checkbox" data-option="narration"> 도입 내레이션 4초</label>
+        </div>
+        <p class="script" data-script hidden></p>
+      </section>
+      <section aria-label="주요 편집 내역">
+        <h3>주요 편집 내역</h3>
+        <ol class="edit-list">
+          <li><div><p class="edit-title" data-trim-title>수업 시작 전 대기 18초 삭제</p><p class="metadata" data-trim-time>원본 00:06–00:24</p></div><button class="action" data-edit="trim" type="button">구간 복원</button></li>
+          <li><div><p class="edit-title">판서로 화면 전환</p><p class="metadata">원본 23:43 · 그림 설명 시작</p></div><button class="action" data-edit="board" type="button">전환 해제</button></li>
+          <li><div><p class="edit-title">1/3 조각에 색 강조</p><p class="metadata">원본 23:46 · 두 조각 비교</p></div><button class="action" data-edit="highlight" type="button">효과 끄기</button></li>
+        </ol>
+      </section>
+    </div>
+    <p class="sr" data-status aria-live="polite" aria-atomic="true"></p>
+  </section>
+</div>
+<script>
+(() => {
+  const root = document.getElementById('lesson-cut-preview');
+  const find = selector => root.querySelector(selector);
+  const buttons = Array.from(root.querySelectorAll('[data-format]'));
+  const settings = Array.from(root.querySelectorAll('[data-option]'));
+  const edits = Array.from(root.querySelectorAll('[data-edit]'));
+  const defaults = { trim: true, board: true, highlight: true, captions: true, narration: false };
+  const examples = {
+    lesson: { label: '본편', duration: 432, gap: 18, trimName: '수업 시작 전 대기', trimTime: '00:06–00:24', at: '23:46', caption: '선생님 · 같은 크기의 피자를 나눠 볼게요.', voice: '두 사람은 같은 크기의 피자로 분수를 비교합니다.' },
+    short: { label: '세로 쇼츠', duration: 43, gap: 5, trimName: '화면 공유 준비', trimTime: '23:37–23:42', at: '23:51', caption: '학생 · 어? 숫자가 작은데 조각은 더 커요!', voice: '피자 한 조각, 어느 쪽이 더 클까요?' }
+  };
+  const actions = { trim: ['구간 복원', '다시 삭제'], board: ['전환 해제', '전환 적용'], highlight: ['효과 끄기', '효과 켜기'] };
+  let state;
+
+  function restore(snapshot) {
+    const data = snapshot?.privateContent;
+    const saved = data?.version === 1 ? data : {};
+    state = { format: saved.format === 'short' ? 'short' : 'lesson', compare: saved.compare === true, outputs: {} };
+    for (const format of Object.keys(examples)) {
+      const values = { ...defaults };
+      for (const key of Object.keys(values)) {
+        const value = saved.outputs?.[format]?.[key];
+        if (typeof value === 'boolean') values[key] = value;
+      }
+      state.outputs[format] = values;
+    }
+  }
+
+  function duration(format) {
+    const entry = examples[format];
+    const output = state.outputs[format];
+    const seconds = entry.duration + (output.trim ? 0 : entry.gap) + (output.narration ? 4 : 0);
+    return Math.floor(seconds / 60) + ':' + String(seconds % 60).padStart(2, '0');
+  }
+
+  function render() {
+    const entry = examples[state.format];
+    const output = state.outputs[state.format];
+    const portrait = state.format === 'short' && !state.compare;
+    const meeting = state.compare || !output.board;
+    const captions = !state.compare && output.captions;
+    for (const button of buttons) {
+      const format = button.dataset.format;
+      button.setAttribute('aria-pressed', String(format === state.format));
+      button.querySelector('.duration').textContent = duration(format);
+    }
+    const frame = find('[data-frame]');
+    frame.classList.toggle('portrait', portrait);
+    frame.classList.toggle('meeting', meeting);
+    frame.classList.toggle('marked', !state.compare && output.highlight);
+    frame.classList.toggle('subtitled', captions);
+    find('.people').hidden = !meeting;
+    find('.caption').hidden = !captions;
+    find('.caption').textContent = entry.caption;
+    find('[data-position]').textContent = '원본 ' + entry.at + ' · ' + (portrait ? '9:16' : '16:9');
+    find('[data-compare]').setAttribute('aria-pressed', String(state.compare));
+    find('[data-compare]').textContent = state.compare ? '편집본으로 돌아가기' : '원본 보기';
+    find('[data-trim-title]').textContent = entry.trimName + ' ' + entry.gap + '초 ' + (output.trim ? '삭제' : '복원됨');
+    find('[data-trim-time]').textContent = '원본 ' + entry.trimTime;
+    for (const button of edits) {
+      const key = button.dataset.edit;
+      button.textContent = actions[key][output[key] ? 0 : 1];
+    }
+    for (const control of settings) control.checked = output[control.dataset.option];
+    find('[data-script]').hidden = !output.narration || state.compare;
+    find('[data-script]').textContent = '내레이션 대본 · ' + entry.voice;
+  }
+
+  function update(message) {
+    render();
+    const label = examples[state.format].label;
+    find('[data-status]').textContent = message + ' · ' + label + ' ' + duration(state.format);
+    if (typeof window.openai?.setWidgetState === 'function') {
+      window.openai.setWidgetState({
+        modelContent: { preview: label, edits: { ...state.outputs[state.format] } },
+        privateContent: { version: 1, ...state }
+      }).catch(() => {});
+    }
+  }
+
+  for (const button of buttons) {
+    button.addEventListener('click', () => {
+      state.format = button.dataset.format;
+      state.compare = false;
+      update('편집본 선택');
+    });
+  }
+  find('[data-compare]').addEventListener('click', () => {
+    state.compare = !state.compare;
+    update(state.compare ? '원본 장면' : '자동 편집 장면');
+  });
+  for (const button of edits) {
+    button.addEventListener('click', () => {
+      const message = button.textContent;
+      const key = button.dataset.edit;
+      const output = state.outputs[state.format];
+      output[key] = !output[key];
+      state.compare = false;
+      update(message);
+    });
+  }
+  for (const control of settings) {
+    control.addEventListener('change', () => {
+      state.outputs[state.format][control.dataset.option] = control.checked;
+      state.compare = false;
+      update(control.parentElement.textContent.trim() + (control.checked ? ' 적용' : ' 해제'));
+    });
+  }
+  window.addEventListener('openai:set_globals', event => {
+    const globals = event.detail?.globals;
+    if (globals && 'widgetState' in globals) {
+      restore(globals.widgetState);
+      render();
+    }
+  });
+  restore(window.openai?.widgetState);
+  render();
+})();
+</script>

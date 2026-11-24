@@ -1,0 +1,371 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="theme-color" content="#101513" />
+    <title>컷룸 · 자동 편집 스튜디오</title>
+    <link rel="icon" href="data:," />
+    <link rel="stylesheet" href="/studio.css" />
+    <link rel="stylesheet" href="/editor.css" />
+    <script src="/studio.js" type="module"></script>
+  </head>
+  <body>
+    <a class="skip" href="#content">본문으로 이동</a>
+    <header class="mast">
+      <div class="mast-inner">
+        <a class="brand" href="#studio" aria-label="컷룸 스튜디오 홈"
+          ><i class="mark" aria-hidden="true"></i>Cutroom<span class="brand-dot">.</span></a
+        >
+        <nav aria-label="작업 공간">
+          <a href="#studio" data-nav="studio">스튜디오</a
+          ><a href="#library" data-nav="library">작업 보관함</a>
+        </nav>
+        <span id="engine" class="engine"><i></i>엔진 연결 중</span>
+      </div>
+    </header>
+    <main id="content" tabindex="-1">
+      <section id="home" class="page">
+        <div class="page-head">
+          <h1>자동 편집 스튜디오</h1>
+          <p>영상 한 편에서 핵심을 담은 본편과 세로 쇼츠를 만드세요.</p>
+        </div>
+        <div class="launch-grid">
+          <section id="drop" class="drop">
+            <span class="crop tl"></span><span class="crop tr"></span><span class="crop bl"></span
+            ><span class="crop br"></span>
+            <div class="upload-symbol" aria-hidden="true"><i></i><b></b></div>
+            <h2 id="drop-title">원본 영상을 놓아주세요</h2>
+            <p id="drop-meta">MP4 · MOV · WebM · MKV · M4V · AVI</p>
+            <button class="primary" id="pick"><span class="plus" aria-hidden="true"></span>영상 선택</button>
+            <div class="caption-attach">
+              <span id="speech-info">한국어 자동 자막</span
+              ><button class="text-button" id="attach">자막 파일 첨부</button
+              ><button class="text-button" id="unset-caption" hidden aria-label="첨부 자막 빼기">×</button>
+            </div>
+            <div class="drop-tags">
+              <span><i class="format-icon wide-icon"></i>5–10분 본편</span
+              ><span><i class="format-icon tall-icon"></i>1분 이내 쇼츠</span>
+            </div>
+            <input type="file" id="file" accept=".mp4,.mov,.m4v,.webm,.mkv,.avi,.srt,.vtt" multiple hidden />
+            <input type="file" id="caption-file" accept=".srt,.vtt" hidden />
+          </section>
+          <article class="demo-card">
+            <div class="demo-visual">
+              <img src="/demo-poster.jpg" alt="같은 크기의 두 피자를 나누어 분수를 비교하는 예시 수업" /><span
+                class="time-stamp"
+                >01:29</span
+              >
+            </div>
+            <div class="demo-body">
+              <span class="small-label">예시 수업</span>
+              <h2>피자 한 조각으로 배우는 분수</h2>
+              <p>선생님과 학생의 대화를 실제로 편집해 보세요.</p>
+              <button class="secondary" id="demo">
+                <span class="play-icon" aria-hidden="true"></span>예시로 테스트
+              </button>
+            </div>
+          </article>
+        </div>
+        <section class="shelf">
+          <div class="section-head">
+            <h2>최근 작업</h2>
+            <a href="#library" class="text-button">전체 보기</a>
+          </div>
+          <div id="recent" class="job-list"></div>
+        </section>
+      </section>
+      <section id="library" class="page" hidden>
+        <div class="page-head with-action">
+          <div>
+            <h1>작업 보관함</h1>
+            <p>이 PC에서 편집한 영상과 진행 중인 작업을 다시 열 수 있어요.</p>
+          </div>
+          <a href="#studio" class="secondary">새 편집</a>
+        </div>
+        <div id="all-jobs" class="job-list"></div>
+      </section>
+      <section id="work" class="page" hidden>
+        <a class="text-button back" href="#studio">스튜디오로 돌아가기</a>
+        <div class="page-head with-action work-heading">
+          <div>
+            <h1 id="job-name">편집 중</h1>
+            <p id="job-meta"></p>
+          </div>
+          <span id="job-stage" class="pill"></span>
+        </div>
+        <section id="progress-area" class="process-box" aria-label="작업 진행">
+          <div class="section-head">
+            <h2 id="progress-title">영상을 준비하고 있어요</h2>
+            <strong id="percent">0%</strong>
+          </div>
+          <progress id="progress" value="0" max="100"></progress>
+          <p id="progress-detail"></p>
+        </section>
+        <div id="retry-box" class="alert" role="alert" hidden>
+          <span id="retry-text"></span><button class="secondary" id="retry">다시 편집</button>
+        </div>
+        <section id="editor" hidden>
+          <div class="editor-top">
+            <div class="output-picks" role="group" aria-label="편집할 버전">
+              <button data-mode="main" aria-pressed="true">
+                <i class="format-icon wide-icon"></i><span>가로 본편</span>
+                <small id="main-time" data-ratio="16:9"></small>
+              </button>
+              <button data-mode="short" aria-pressed="false" aria-label="쇼츠 · 전체 담기">
+                <i class="format-icon tall-icon"></i
+                ><span><span class="format-prefix">쇼츠 · </span>전체 담기</span>
+                <small id="short-time" data-ratio="9:16"></small>
+              </button>
+              <button data-mode="crop" aria-pressed="false" aria-label="쇼츠 · 꽉 채우기">
+                <i class="format-icon tall-icon"></i
+                ><span><span class="format-prefix">쇼츠 · </span>꽉 채우기</span>
+                <small id="crop-time" data-ratio="9:16"></small>
+              </button>
+            </div>
+            <a id="download" class="primary" download>MP4 다운로드</a>
+          </div>
+          <div class="editor-grid">
+            <section class="monitor" aria-label="영상 미리보기">
+              <div id="screen" class="screen">
+                <div class="picture">
+                  <video id="player" controls playsinline preload="metadata"></video>
+                  <img id="draft-frame" alt="현재 설정으로 렌더링한 장면" hidden />
+                  <span id="audition-caption" hidden></span>
+                </div>
+              </div>
+              <div class="monitor-bar">
+                <span id="dimensions" aria-live="polite"></span>
+                <div class="monitor-actions">
+                  <button id="return-to-tools" class="text-button">편집 도구로</button
+                  ><button id="compare" class="quiet" aria-pressed="false">원본 보기</button>
+                </div>
+              </div>
+              <div class="edit-timeline">
+                <div class="section-head">
+                  <h3 id="timeline-heading">저장된 편집본</h3>
+                  <span id="timeline-time"></span>
+                </div>
+                <div id="timeline" class="strips" aria-label="편집본 구간 재생"></div>
+                <div class="review-tools" id="draft-review" hidden>
+                  <button id="review-opening" class="quiet">첫 30초</button>
+                  <button id="review-join" class="quiet">이음새 듣기</button>
+                  <button id="review-all" class="text-button">초안 전체 재생</button>
+                  <button id="stop-review" class="quiet" hidden>재생 중지</button>
+                </div>
+              </div>
+              <div class="subtitle-export">
+                <span id="caption-origin"></span
+                ><a id="srt" class="text-button" download>자막 파일 다운로드</a>
+              </div>
+            </section>
+            <section class="inspector" aria-label="편집 도구">
+              <div class="tool-tabs" role="group" aria-label="편집 도구 선택">
+                <button data-tool="cuts" aria-pressed="true">장면 자르기</button
+                ><button data-tool="captions" aria-pressed="false">자막 맞추기</button
+                ><button data-tool="style" aria-pressed="false">화면 스타일</button>
+              </div>
+              <section class="tool-panel" data-panel="cuts">
+                <div class="section-head">
+                  <h2>장면 선택</h2>
+                  <button type="button" class="text-button" id="bulk" aria-pressed="false">
+                    여러 개 선택
+                  </button>
+                </div>
+                <p class="hint" id="cuts-help">장면을 누르면 원본에서 시작과 끝을 조절할 수 있어요.</p>
+                <details id="recommendations" class="recommendations">
+                  <summary>자동 추천 비교</summary>
+                  <p id="recommend-status" class="hint" role="status"></p>
+                  <ul id="recommend-list" aria-label="추천 구간 들어보기"></ul>
+                  <button id="use-recommendations" class="quiet" type="button" disabled>이 구간을 초안에 적용</button>
+                </details>
+                <div class="batch" id="batch-bar" hidden>
+                  <label><input type="checkbox" id="select-all" /> 모두 선택</label>
+                  <div>
+                    <button id="batch-split" class="quiet" hidden>선택 나누기</button>
+                    <button id="include" class="quiet">포함</button
+                    ><button id="exclude" class="quiet">제외</button>
+                  </div>
+                </div>
+                <div id="clips" class="clip-list"></div>
+                <button id="add-cut" class="text-button">+ 현재 위치에 장면 추가</button>
+                <div class="fine-cut">
+                  <div class="section-head">
+                    <h3>원본에서 자르기</h3>
+                    <button id="play-cut" class="quiet">선택 구간 재생</button>
+                  </div>
+                  <p class="hint" id="cut-reason" hidden></p>
+                  <div id="cut-wave-place">
+                    <div id="trim-wave" class="trim-track" hidden>
+                      <div class="wave-label">
+                        <span id="wave-type">소리 파형</span><span>눌러 이동 · 양끝을 끌어 조절</span>
+                      </div>
+                      <div class="wave-area">
+                        <canvas width="840" height="64" aria-hidden="true"></canvas
+                        ><span class="wave-window"></span><span class="wave-cursor" hidden></span>
+                        <button
+                          type="button"
+                          class="wave-edge"
+                          role="slider"
+                          data-edge="start"
+                          aria-label="파형에서 시작 시각 조절"
+                        ></button>
+                        <button
+                          type="button"
+                          class="wave-edge"
+                          role="slider"
+                          data-edge="end"
+                          aria-label="파형에서 끝 시각 조절"
+                        ></button>
+                      </div>
+                    </div>
+                  </div>
+                  <div id="split-tools" class="split-tools" hidden>
+                    <div class="split-row">
+                      <button id="split-now" class="secondary" aria-keyshortcuts="S">
+                        재생 위치에서 분할 <kbd>S</kbd></button
+                      ><label class="split-clock-field"
+                        >원본 시각
+                        <input
+                          type="text"
+                          id="split-clock"
+                          aria-label="분할할 원본 시각"
+                          title="분:초.밀리초 또는 초"
+                          spellcheck="false"
+                      /></label>
+                    </div>
+                    <div class="split-row">
+                      <select id="split-rule" aria-label="자동 분할 기준">
+                        <option value="speech">대사 경계 우선</option>
+                        <option value="5">5초 간격</option>
+                        <option value="10">10초 간격</option></select
+                      ><button id="split-auto" class="quiet">선택 장면 나누기</button>
+                    </div>
+                  </div>
+                  <div class="time-grid" id="cut-times"></div>
+                  <div class="cut-actions">
+                    <span id="cut-length" class="hint"></span
+                    ><button id="to-short" class="text-button">이 장면으로 크롭 쇼츠 만들기</button>
+                  </div>
+                </div>
+              </section>
+              <section class="tool-panel" data-panel="captions" hidden>
+                <div class="section-head">
+                  <h2>문장과 발화 시점</h2>
+                  <label class="simple-check"
+                    ><input type="checkbox" data-setting="captions" /> 자막 표시</label
+                  >
+                </div>
+                <p id="no-cues" class="hint" hidden>
+                  원본에서 자막을 시작할 위치를 고른 뒤 첫 문장을 추가하세요.
+                </p>
+                <button class="text-button" id="add-cue" disabled>+ 현재 위치에 자막 추가</button>
+                <div id="cue-form">
+                  <div class="cue-search">
+                    <input
+                      id="cue-search"
+                      type="search"
+                      aria-label="자막 문구 검색"
+                      placeholder="자막 문구 검색"
+                    /><button class="quiet" id="find-cue">현재 대사 찾기</button>
+                  </div>
+                  <label class="field">편집할 문장<select id="cue-select"></select></label>
+                  <label class="field"
+                    >자막 내용<textarea id="cue-text" rows="2" maxlength="3000"></textarea>
+                  </label>
+                  <div id="cue-wave-place"></div>
+                  <div class="time-grid" id="cue-times"></div>
+                  <div class="cut-actions">
+                    <button class="quiet" id="play-cue">음성과 자막 함께 확인</button
+                    ><button class="text-button" id="omit-cue">자막만 숨기기</button>
+                  </div>
+                  <div class="spoken-edit" id="spoken-edit" hidden>
+                    <button id="omit-spoken" class="quiet">이 대사 구간을 본편에서 빼기</button>
+                    <button id="repeat-cue" class="text-button" hidden>다음 반복 대사 찾기</button>
+                    <button id="repeat-other" class="text-button" hidden>비교 구간 듣기</button>
+                  </div>
+                  <div class="shift-control">
+                    <label for="caption-shift"
+                      >전체 자막 시간 이동 <small>음성보다 늦게 뜨면 앞으로 당기세요.</small></label
+                    >
+                    <div class="shift-input">
+                      <button class="quiet" id="shift-earlier">0.1초 앞으로</button
+                      ><input
+                        id="caption-shift"
+                        type="number"
+                        min="-60"
+                        max="60"
+                        step="0.1"
+                        aria-label="전체 자막 이동 초"
+                      /><button class="quiet" id="shift-later">0.1초 뒤로</button>
+                    </div>
+                  </div>
+                </div>
+              </section>
+              <section class="tool-panel" data-panel="style" hidden>
+                <h2>화면 스타일</h2>
+                <div id="crop-position" hidden>
+                  <div class="section-head">
+                    <h3>크롭 위치</h3>
+                    <button id="crop-center" type="button" class="quiet">중앙 맞춤</button>
+                  </div>
+                  <p class="hint" id="crop-description"></p>
+                  <label class="field"
+                    >가로 중심 <input type="range" id="crop-x" min="0" max="100" step="1" value="50"
+                  /></label>
+                  <label class="field" id="crop-y-field"
+                    >세로 중심 <input type="range" id="crop-y" min="0" max="100" step="1" value="50"
+                  /></label>
+                </div>
+                <label class="field"
+                  >자막 글꼴<select id="font">
+                    <option value="gothic">맑은 고딕 · 굵게</option>
+                    <option value="serif">바탕 · 명조</option>
+                    <option value="round">굴림 · 둥글게</option>
+                  </select></label
+                >
+                <fieldset class="look-set">
+                  <legend>영상 필터</legend>
+                  <div id="looks">
+                    <button data-look="original">원본 색감</button><button data-look="warm">따뜻하게</button
+                    ><button data-look="clear">선명하게</button><button data-look="mono">흑백</button>
+                  </div>
+                </fieldset>
+                <div class="settings">
+                  <label
+                    ><span>핵심 자막 색 강조</span
+                    ><input type="checkbox" role="switch" data-setting="emphasis" /></label
+                  ><label
+                    ><span>장면 사이 페이드</span
+                    ><input type="checkbox" role="switch" data-setting="transition" /></label
+                  ><label
+                    ><span>도입 내레이션</span><input type="checkbox" role="switch" data-setting="narration"
+                  /></label>
+                </div>
+                <button id="preview-style" class="quiet">현재 위치로 스타일 미리보기</button>
+              </section>
+              <p id="edit-feedback" role="status"></p>
+              <div id="cut-history" class="cut-history" hidden>
+                <button id="cut-undo" class="text-button" disabled>컷 되돌리기</button
+                ><button id="cut-redo" class="text-button" disabled>다시 실행</button>
+              </div>
+              <div class="save-bar">
+                <div>
+                  <strong id="clip-count"></strong>
+                  <p id="draft-status" aria-live="polite"></p>
+                </div>
+                <div class="save-buttons">
+                  <button id="undo" class="text-button" disabled>수정 취소</button
+                  ><button id="apply" class="primary" disabled>변경 저장</button>
+                </div>
+              </div>
+            </section>
+          </div>
+        </section>
+      </section>
+    </main>
+    <div id="toast" role="status" aria-live="polite" hidden></div>
+    <noscript>컷룸의 업로드와 편집 기능을 사용하려면 JavaScript를 켜주세요.</noscript>
+  </body>
+</html>
